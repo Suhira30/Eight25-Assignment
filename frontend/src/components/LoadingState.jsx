@@ -1,11 +1,3 @@
-import { useEffect, useState } from 'react'
-
-const MESSAGES = [
-  'Fetching page...',
-  'Extracting metrics...',
-  'Generating insights...',
-]
-
 function SkeletonBlock({ className = '' }) {
   return (
     <div className={`bg-surface-container animate-pulse rounded-lg ${className}`} />
@@ -23,25 +15,8 @@ function SkeletonCard() {
 }
 
 export default function LoadingState() {
-  const [messageIndex, setMessageIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => Math.min(prev + 1, MESSAGES.length - 1))
-    }, 2500)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <div className="w-full">
-      {/* Status message */}
-      <div className="flex items-center gap-stack-sm mb-stack-lg">
-        <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-        <p className="text-body-md font-body-md text-on-surface-variant">
-          {MESSAGES[messageIndex]}
-        </p>
-      </div>
-
       {/* Skeleton grid matching MetricsSection layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-md mb-stack-lg">
         <SkeletonCard />

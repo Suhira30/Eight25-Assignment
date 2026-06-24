@@ -8,6 +8,7 @@ import Recommendations from './components/Recommendations'
 import Footer from './components/Footer'
 import LoadingState from './components/LoadingState'
 import ErrorBanner from './components/ErrorBanner'
+import AuditProgress from './components/AuditProgress'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -131,6 +132,8 @@ function App() {
             onDismiss={() => setMetricsStatus('idle')}
           />
         )}
+
+        <AuditProgress metricsStatus={metricsStatus} aiStatus={aiStatus} />
 
         {metricsStatus === 'loading' && <LoadingState />}
 
