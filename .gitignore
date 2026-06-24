@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-dist/
-build/
+#handled in front end .gitignore
+# dist/
+# build/
 .DS_Store
