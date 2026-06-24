@@ -32,8 +32,25 @@ export default function Recommendations({ items = DEFAULT_RECOMMENDATIONS }) {
   return (
     <section className="mt-stack-lg">
       <h2 className="text-headline-lg font-headline-lg mb-stack-md">Prioritized Recommendations</h2>
+
       <div className="card-flat overflow-hidden bg-white">
-        <table className="w-full text-left border-collapse">
+        {/* Mobile: stacked cards */}
+        <div className="md:hidden divide-y divide-outline-variant">
+          {items.map(({ priority, title, reasoning }) => (
+            <div key={title} className="p-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`${PRIORITY_STYLES[priority]} px-3 py-1 rounded-full text-label-sm font-label-sm font-bold`}>
+                  {priority}
+                </span>
+                <span className="font-bold text-body-md font-body-md">{title}</span>
+              </div>
+              <p className="text-body-md font-body-md text-on-surface-variant">{reasoning}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table */}
+        <table className="hidden md:table w-full text-left border-collapse">
           <thead className="bg-surface-container-low">
             <tr>
               <th className="p-4 text-label-sm font-label-sm text-on-surface-variant uppercase">Priority</th>

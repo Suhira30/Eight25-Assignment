@@ -95,7 +95,7 @@ function App() {
     <div className="bg-background min-h-screen font-body-md flex flex-col">
       <Header />
 
-      <main className="flex-1 max-w-container-max w-full mx-auto px-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
+      <main className="flex-1 max-w-container-max w-full mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
         <URLInput onAnalyze={handleAnalyze} />
 
         {status === 'error' && (
@@ -120,7 +120,7 @@ function App() {
             <section className="mt-stack-lg flex flex-col md:flex-row justify-between items-center gap-stack-md py-stack-lg border-t border-outline-variant">
               <div>
                 <h3 className="text-headline-md font-headline-md">Audit Summary</h3>
-                <p className="text-body-md font-body-md text-on-surface-variant">
+                <p className="text-body-md font-body-md text-on-surface-variant break-all">
                   {data.url} · Report generated on {new Date(data.scraped_at).toLocaleDateString()}
                 </p>
               </div>

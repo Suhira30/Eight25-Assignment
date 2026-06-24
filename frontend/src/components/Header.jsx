@@ -1,6 +1,6 @@
 export default function Header() {
   return (
-    <header className="bg-surface border-b border-outline-variant flex justify-between items-center px-margin-desktop w-full max-w-container-max mx-auto h-16 sticky top-0 z-50">
+    <header className="bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto h-16 sticky top-0 z-50">
       <div className="text-headline-lg font-headline-lg font-bold text-primary">SEO Insight</div>
       <div className="flex items-center gap-stack-md">
         <button
