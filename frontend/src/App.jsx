@@ -123,6 +123,15 @@ function App() {
       <Header />
 
       <main className="flex-1 max-w-container-max w-full mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
+        <div id="print-header" aria-hidden="true" className="hidden">
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>SEO Audit Report</h1>
+          {showMetrics && (
+            <p style={{ fontSize: '0.875rem', color: '#555', marginTop: '0.25rem' }}>
+              {metricsData.url}
+            </p>
+          )}
+        </div>
+
         <URLInput onAnalyze={handleAnalyze} />
 
         {metricsStatus === 'error' && (
