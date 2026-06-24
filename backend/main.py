@@ -3,7 +3,7 @@ import time
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -88,7 +88,7 @@ async def health() -> dict:
 
 
 @app.post("/analyze")
-async def analyze(request: AnalyzeRequest) -> AuditResponse:
+async def analyze(request: AnalyzeRequest, metrics_only: bool = Query(False)) -> AuditResponse:
     url = str(request.url)
 
     cached = _cache_get(url)
@@ -98,7 +98,6 @@ async def analyze(request: AnalyzeRequest) -> AuditResponse:
 
     scraped_data = scraper.scrape(url)
     readability = readability_module.compute(scraped_data.visible_text)
-    ai_analysis, prompt_log = analyzer.analyze(scraped_data, readability)
 
     metrics: dict = {
         "word_count": scraped_data.word_count,
@@ -113,6 +112,15 @@ async def analyze(request: AnalyzeRequest) -> AuditResponse:
         metrics["meta_title"] = scraped_data.meta_title.model_dump()
     if scraped_data.meta_description:
         metrics["meta_description"] = scraped_data.meta_description.model_dump()
+
+    if metrics_only:
+        return AuditResponse(
+            url=url,
+            scraped_at=datetime.now(timezone.utc),
+            metrics=metrics,
+        )
+
+    ai_analysis, prompt_log = analyzer.analyze(scraped_data, readability)
 
     result = AuditResponse(
         url=url,

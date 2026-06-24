@@ -5,30 +5,31 @@ const PRIORITY_STYLES = {
   LOW: 'bg-surface-container-highest text-on-secondary-fixed-variant',
 }
 
-const DEFAULT_RECOMMENDATIONS = [
-  {
-    priority: 'CRITICAL',
-    title: 'Shorten Meta Description',
-    reasoning: 'Current length (182 chars) exceeds the 160-character display limit in Google, causing truncation.',
-  },
-  {
-    priority: 'HIGH',
-    title: 'Add Missing Alt Text',
-    reasoning: '6 images (25% of total) lack alt tags, hindering accessibility and image search indexing.',
-  },
-  {
-    priority: 'MEDIUM',
-    title: 'Optimize Hero CTA Color',
-    reasoning: 'Accessibility contrast check failed for primary buttons. Switch to #7a00df for higher visibility.',
-  },
-  {
-    priority: 'LOW',
-    title: 'Implement WebP Images',
-    reasoning: 'Page speed is good (94), but total page size can be reduced by 40% with modern image formats.',
-  },
-]
 
-export default function Recommendations({ items = DEFAULT_RECOMMENDATIONS }) {
+const SKELETON_KEYS = ['sk-a', 'sk-b', 'sk-c', 'sk-d']
+
+export default function Recommendations({ items = null, loading = false }) {
+  if (loading) {
+    return (
+      <section className="mt-stack-lg">
+        <h2 className="text-headline-lg font-headline-lg mb-stack-md">Prioritized Recommendations</h2>
+        <div className="card-flat overflow-hidden bg-white divide-y divide-outline-variant animate-pulse">
+          {SKELETON_KEYS.map((key) => (
+            <div key={key} className="p-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-16 bg-surface-container rounded-full" />
+                <div className="h-4 w-1/3 bg-surface-container rounded" />
+              </div>
+              <div className="h-3 bg-surface-container rounded w-4/5" />
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (!items) return null
+
   return (
     <section className="mt-stack-lg">
       <h2 className="text-headline-lg font-headline-lg mb-stack-md">Prioritized Recommendations</h2>

@@ -59,7 +59,7 @@ cd backend && pytest tests/ -v
 
 ## Trade-offs
 
-- Single POST /analyze: one round-trip, simple state machine -- no streaming progress
+- Two-phase loading (metrics_only then full): metrics visible in ~2–3s, AI fills in at ~8–15s -- re-scrapes the page twice on cache miss (~1–2s overhead); cache hit makes both phases instant
 - Flesch formula: zero cost, deterministic -- less accurate than ML-based models
 - window.print() for PDF: zero dependencies -- limited styling vs headless Chrome
 - GEO/AEO excluded: all insights grounded in real data -- narrower audit scope

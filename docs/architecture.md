@@ -6,25 +6,34 @@
 ┌──────────────────────────────────────────────────────────────┐
 │                      BROWSER (React 19)                       │
 │                                                               │
-│  [URLInput] ──── POST /analyze ──────────────────────────┐   │
-│                                                           │   │
-│  <LoadingState/>                                          │   │
-│   "Fetching page..." (0s)                                 │   │
-│   "Extracting metrics..." (2.5s)                          │   │
-│   "Generating insights..." (5s)                           │   │
-│                                                           ▼   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐│
-│  │   Metrics    │  │ Readability  │  │  AI Analysis +       ││
-│  │   Section    │  │   Gauge      │  │  Recommendations     ││
-│  └──────────────┘  └──────────────┘  └──────────────────────┘│
+│  [URLInput]                                                   │
+│      │                                                        │
+│      ├─ Phase 1: POST /analyze?metrics_only=true  (~2–3 s)   │
+│      │                                                        │
+│      │   <LoadingState/> skeleton shown while waiting         │
+│      │                                                        │
+│      │   ┌──────────────┐  ┌──────────────┐                  │
+│      │   │   Metrics    │  │ Readability  │  ← appears first │
+│      │   │   Section    │  │   Gauge      │                   │
+│      │   └──────────────┘  └──────────────┘                  │
+│      │                                                        │
+│      └─ Phase 2: POST /analyze          (~8–15 s)            │
+│                                                               │
+│          ┌──────────────────────────────────────────────┐    │
+│          │  AI Analysis + Recommendations               │    │
+│          │  (skeleton → real content when ready)        │    │
+│          └──────────────────────────────────────────────┘    │
+│                                                               │
+│  Cache hit: Phase 1 returns full result → Phase 2 skipped    │
 │                                                               │
 │  [Export] ──── globalThis.print() ──── browser PDF dialog    │
 └──────────────────────────────────────────────────────────────┘
-                            │
-                     POST /analyze
-                     { "url": "..." }
-                            │
-┌───────────────────────────▼──────────────────────────────────┐
+                     │                  │
+          Phase 1 (metrics_only)   Phase 2 (full)
+          POST /analyze            POST /analyze
+          ?metrics_only=true       { "url": "..." }
+                     │                  │
+┌────────────────────▼──────────────────▼──────────────────────┐
 │                     FastAPI Backend                            │
 │                                                               │
 │  main.py                                                      │
@@ -37,12 +46,17 @@
 │    │     pure function                   └─ ReadabilityResult │
 │    │                                       (Pydantic)         │
 │    │                                                          │
+│    ├── [metrics_only=true] ────────────► return early         │
+│    │     skip AI call                    AuditResponse        │
+│    │                                     (ai_analysis=None)   │
+│    │                                                          │
 │    └── analyzer.py ───────────────────► Gemini Flash (dev)   │
 │          reads AI_PROVIDER env var      └─ Claude Sonnet (prod)
 │          both return (AIAnalysis,         └─ AIAnalysis       │
 │                        PromptLog)            (Pydantic)       │
 │                                                               │
 │  AuditResponse ◄── models.py (single shared Pydantic contract)│
+│  (ai_analysis Optional — None on metrics_only path)          │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -71,10 +85,12 @@
 ## Data Flow (step by step)
 
 ```
-1.  Browser sends  POST /analyze  { "url": "https://client-site.com" }
+─── PHASE 1 (metrics_only=true) ───────────────────────────────
 
-2.  main.py        validates URL via Pydantic AnalyzeRequest
-                   raises 422 immediately if malformed
+1.  Browser sends  POST /analyze?metrics_only=true  { "url": "..." }
+
+2.  main.py        checks TTL cache — hit returns full result immediately
+                   validates URL via Pydantic AnalyzeRequest
 
 3.  scraper.scrape(url)
       a. GET request with browser User-Agent, timeout=10s
@@ -88,36 +104,53 @@
       g. Return ScrapedData (Pydantic)
 
 4.  readability.compute(scraped_data.visible_text)
-      a. Tokenize into sentences and words
-      b. Count syllables per word (regex vowel-group approximation)
-      c. Apply Flesch formula: 206.835 − 1.015×(w/s) − 84.6×(syl/w)
-      d. Map score to label (Very Easy → Very Difficult)
-      e. Return ReadabilityResult (Pydantic)
+      Apply Flesch formula → ReadabilityResult (Pydantic)
 
-5.  analyzer.analyze(scraped_data, readability)
+5.  main.py detects metrics_only=true → return early
+      AuditResponse(metrics=..., ai_analysis=None, prompt_log=None)
+      ~2–3 s total
+
+6.  Browser receives partial JSON
+      MetricsSection and ReadabilityGauge render immediately
+      AIAnalysis and Recommendations show skeleton placeholders
+
+─── PHASE 2 (full analysis) ────────────────────────────────────
+
+7.  Browser sends  POST /analyze  { "url": "..." }
+
+8.  main.py        checks TTL cache — hit returns full result, Phase 2 done
+
+9.  scraper.scrape(url) — re-runs scrape (~1–2 s)
+
+10. readability.compute() — re-runs (instant)
+
+11. analyzer.analyze(scraped_data, readability)
       a. Call build_user_prompt() — null metrics excluded from output
       b. Route to Gemini (AI_PROVIDER=gemini) or Claude (AI_PROVIDER=claude)
-      c. Gemini: GenerativeModel with response_schema=_PageAnalysis
+      c. Gemini: GenerativeModel with response_mime_type=application/json
          Claude: messages.create with tool_choice forced to analyze_page
       d. Parse structured response into AIAnalysis (Pydantic)
       e. Capture system_prompt + user_prompt + raw_model_output into PromptLog
       f. Return (AIAnalysis, PromptLog)
 
-6.  main.py assembles AuditResponse
-      metrics dict: ScrapedData fields + ReadabilityResult (null metrics included)
+12. main.py assembles full AuditResponse → stores in TTL cache
+      metrics dict: ScrapedData fields + ReadabilityResult
       ai_analysis:  AIAnalysis
       prompt_log:   PromptLog (system prompt, user prompt, raw model output)
 
-7.  FastAPI serializes AuditResponse to JSON → 200 OK
+13. FastAPI serializes AuditResponse to JSON → 200 OK
 
-8.  Browser receives JSON
-      App.jsx normalizes snake_case → camelCase
-      Passes data to MetricsSection, ReadabilityGauge, AIAnalysis, Recommendations
-      Audit summary bar shows URL + scraped_at timestamp
+14. Browser receives full JSON
+      AIAnalysis skeleton replaced with real insight cards
+      Recommendations skeleton replaced with prioritized table
+      Audit summary bar appears
 
-9.  Exception path (any step above):
+─── Exception path (any step above) ────────────────────────────
+
       ScrapeError subclass  → 422 { error: code, reason: message }
       AIAnalysisError       → 502 { error: "AI_FAILED", reason: message }
       Unhandled exception   → 500 { error: "INTERNAL_ERROR", reason: "..." }
       All exceptions logged before mapping — no silent failures
+      Phase 1 failure → error banner, no results shown
+      Phase 2 failure → metrics remain visible, AI sections hidden
 ```

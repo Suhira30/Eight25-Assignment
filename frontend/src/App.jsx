@@ -54,42 +54,68 @@ function normalizeInsights(apiInsights) {
     }))
 }
 
-async function fetchAudit(url) {
-  const response = await fetch(`${API_URL}/analyze`, {
+async function fetchAudit(url, metricsOnly = false) {
+  const qs = metricsOnly ? '?metrics_only=true' : ''
+  const response = await fetch(`${API_URL}/analyze${qs}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
   })
   const json = await response.json()
-  if (!response.ok) {
-    throw json
-  }
+  if (!response.ok) throw json
   return json
 }
 
 function App() {
-  const [status, setStatus] = useState('idle')
-  const [data,   setData]   = useState(null)
-  const [error,  setError]  = useState(null)
+  const [metricsStatus, setMetricsStatus] = useState('idle')
+  const [aiStatus,      setAiStatus]      = useState('idle')
+  const [metricsData,   setMetricsData]   = useState(null)
+  const [aiData,        setAiData]        = useState(null)
+  const [error,         setError]         = useState(null)
 
   async function handleAnalyze(url) {
-    setStatus('loading')
+    setMetricsStatus('loading')
+    setAiStatus('idle')
     setError(null)
+    setMetricsData(null)
+    setAiData(null)
+
+    // Phase 1: scrape + readability (~2–3 s)
     try {
-      const result = await fetchAudit(url)
-      setData(result)
-      setStatus('success')
+      const partial = await fetchAudit(url, true)
+      setMetricsData(partial)
+      setMetricsStatus('success')
+
+      // Cache hit returns the full result — skip Phase 2
+      if (partial.ai_analysis) {
+        setAiData(partial)
+        setAiStatus('success')
+        return
+      }
     } catch (err) {
       setError(
         err?.reason
           ? err
           : { error: 'NETWORK_ERROR', reason: 'Could not reach the server. Please check your connection and try again.' }
       )
-      setStatus('error')
+      setMetricsStatus('error')
+      return
+    }
+
+    // Phase 2: AI analysis (~8–15 s)
+    setAiStatus('loading')
+    try {
+      const full = await fetchAudit(url, false)
+      setAiData(full)
+      setAiStatus('success')
+    } catch {
+      setAiStatus('error')
     }
   }
 
-  const isSuccess = status === 'success'
+  const showMetrics = metricsStatus === 'success'
+  const loadingAI   = aiStatus === 'loading'
+  const showAI      = aiStatus === 'success'
 
   return (
     <div className="bg-background min-h-screen font-body-md flex flex-col">
@@ -98,33 +124,41 @@ function App() {
       <main className="flex-1 max-w-container-max w-full mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg flex flex-col gap-stack-lg">
         <URLInput onAnalyze={handleAnalyze} />
 
-        {status === 'error' && (
+        {metricsStatus === 'error' && (
           <ErrorBanner
             error={error.error}
             reason={error.reason}
-            onDismiss={() => setStatus('idle')}
+            onDismiss={() => setMetricsStatus('idle')}
           />
         )}
 
-        {status === 'loading' && <LoadingState />}
+        {metricsStatus === 'loading' && <LoadingState />}
 
-        {isSuccess && (
+        {showMetrics && (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-              <MetricsSection data={normalizeMetrics(data.metrics)} />
-              <ReadabilityGauge score={data.metrics.readability_score ?? 0} label={data.metrics.readability_label} />
+              <MetricsSection data={normalizeMetrics(metricsData.metrics)} />
+              <ReadabilityGauge score={metricsData.metrics.readability_score ?? 0} label={metricsData.metrics.readability_label} />
             </div>
-            <AIAnalysis insights={normalizeInsights(data.ai_analysis.insights)} />
-            <Recommendations items={data.ai_analysis.recommendations} />
+            <AIAnalysis
+              insights={showAI ? normalizeInsights(aiData.ai_analysis.insights) : null}
+              loading={loadingAI}
+            />
+            <Recommendations
+              items={showAI ? aiData.ai_analysis.recommendations : null}
+              loading={loadingAI}
+            />
 
-            <section className="mt-stack-lg flex flex-col md:flex-row justify-between items-center gap-stack-md py-stack-lg border-t border-outline-variant">
-              <div>
-                <h3 className="text-headline-md font-headline-md">Audit Summary</h3>
-                <p className="text-body-md font-body-md text-on-surface-variant break-all">
-                  {data.url} · Report generated on {new Date(data.scraped_at).toLocaleDateString()}
-                </p>
-              </div>
-            </section>
+            {showAI && (
+              <section className="mt-stack-lg flex flex-col md:flex-row justify-between items-center gap-stack-md py-stack-lg border-t border-outline-variant">
+                <div>
+                  <h3 className="text-headline-md font-headline-md">Audit Summary</h3>
+                  <p className="text-body-md font-body-md text-on-surface-variant break-all">
+                    {aiData.url} · Report generated on {new Date(aiData.scraped_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </section>
+            )}
           </>
         )}
       </main>

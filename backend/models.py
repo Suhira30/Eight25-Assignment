@@ -75,5 +75,5 @@ class AuditResponse(BaseModel):
     url: str
     scraped_at: datetime
     metrics: dict
-    ai_analysis: AIAnalysis
-    prompt_log: PromptLog
+    ai_analysis: Optional[AIAnalysis] = None
+    prompt_log: Optional[PromptLog] = None
