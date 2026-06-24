@@ -1,6 +1,6 @@
 # Website Audit Tool
 
-An AI-powered single-page audit tool that scrapes a URL, extracts factual SEO metrics, and runs structured AI analysis via Claude Sonnet 4.6 or Gemini Flash 2.0 -- returning grounded, metric-referenced insights and prioritized recommendations.
+An AI-powered single-page audit tool that scrapes a URL, extracts factual SEO metrics, and runs structured AI analysis via Gemini 2.5 Flash -- returning grounded, metric-referenced insights and prioritized recommendations.
 
 Built for the EIGHT25MEDIA AI-Native Software Engineer assignment.
 
