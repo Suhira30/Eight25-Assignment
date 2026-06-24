@@ -1,21 +1,6 @@
-function getStatus(body) {
-  const l = body.toLowerCase()
-  if (/\b(excellent|optimal|strong|clear|effective|comprehensive|solid|good|properly|adequate|rich|high|well)\b/.test(l))
-    return 'good'
-  if (/\b(no \w|none|zero|critical|major issue|failing|completely missing|not found)\b/.test(l))
-    return 'critical'
-  return 'warning'
-}
-
 function trimToTwoSentences(text) {
   const sentences = text.match(/[^.!?]+[.!?]+/g)
   return sentences ? sentences.slice(0, 2).join(' ').trim() : text
-}
-
-const STATUS = {
-  good:     { label: 'Good',     border: 'border-l-4 border-l-success', badge: 'bg-success-container text-success' },
-  warning:  { label: 'Review',   border: 'border-l-4 border-l-warning', badge: 'bg-warning-container text-warning' },
-  critical: { label: 'Critical', border: 'border-l-4 border-l-error',   badge: 'bg-error-container text-on-error-container' },
 }
 
 const DEFAULT_INSIGHTS = [
@@ -61,27 +46,20 @@ export default function AIAnalysis({ insights = DEFAULT_INSIGHTS }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter">
         {insights.map(({ icon, title, body }, i) => {
-          const status = getStatus(body)
-          const cfg = STATUS[status]
           const isLastSolo = insights.length % 2 !== 0 && i === insights.length - 1
           return (
             <div
               key={title}
-              className={`card-flat p-stack-md ${cfg.border}${isLastSolo ? ' md:col-span-2' : ''}`}
+              className={`card-flat p-stack-md border-l-4 border-l-primary${isLastSolo ? ' md:col-span-2' : ''}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="material-symbols-outlined text-primary"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    {icon}
-                  </span>
-                  <h4 className="font-bold text-body-lg font-body-lg">{title}</h4>
-                </div>
-                <span className={`text-label-sm font-label-sm px-2 py-0.5 rounded-full ${cfg.badge}`}>
-                  {cfg.label}
+              <div className="flex items-center gap-2 mb-2">
+                <span
+                  className="material-symbols-outlined text-primary"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  {icon}
                 </span>
+                <h4 className="font-bold text-body-lg font-body-lg">{title}</h4>
               </div>
               <p className="text-body-md font-body-md text-on-surface-variant">
                 {trimToTwoSentences(body)}
