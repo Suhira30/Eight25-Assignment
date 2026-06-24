@@ -9,7 +9,7 @@ export default function URLInput({ onAnalyze }) {
   }
 
   return (
-    <section className="card-flat p-stack-md flex flex-col md:flex-row gap-stack-md items-center bg-white shadow-sm">
+    <section data-url-input className="card-flat p-stack-md flex flex-col md:flex-row gap-stack-md items-center bg-white shadow-sm">
       <form className="flex flex-col md:flex-row gap-stack-md items-center w-full" onSubmit={handleSubmit}>
         <div className="relative flex-grow w-full">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">link</span>
