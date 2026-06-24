@@ -6,17 +6,15 @@ Built for the EIGHT25MEDIA AI-Native Software Engineer assignment.
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 19 + Vite 8 + Tailwind CSS v4 |
-| Backend | FastAPI + Uvicorn (Python 3.9+) |
-| Scraping | BeautifulSoup4 + Requests |
-| Data contracts | Pydantic v2 |
-| AI (dev) | Gemini Flash 2.0 (google-generativeai) |
-| AI (prod) | Claude Sonnet 4.6 (anthropic) |
-| Readability | Flesch Reading Ease -- pure Python, no AI |
+| Layer          | Technology                                |
+| -------------- | ----------------------------------------- |
+| Frontend       | React 19 + Vite 8 + Tailwind CSS v4       |
+| Backend        | FastAPI + Uvicorn (Python 3.9+)           |
+| Scraping       | BeautifulSoup4 + Requests                 |
+| Data contracts | Pydantic v2                               |
+| AI (dev)       | Gemini Flash 2.0 (google-generativeai)    |
+| AI (prod)      | Claude Sonnet 4.6 (anthropic)             |
+| Readability    | Flesch Reading Ease -- pure Python, no AI |
 
 ---
 
@@ -25,8 +23,8 @@ Built for the EIGHT25MEDIA AI-Native Software Engineer assignment.
 1. Clone the repo and enter the directory
 2. Copy backend/.env.example to backend/.env and add your API keys
 3. pip install -r backend/requirements.txt
-4. cd backend && uvicorn main:app --reload  (http://localhost:8000)
-5. cd frontend && npm install && npm run dev  (http://localhost:5173)
+4. cd backend && uvicorn main:app --reload (http://localhost:8000)
+5. cd frontend && npm install && npm run dev (http://localhost:5173)
 
 Switch AI provider: set AI_PROVIDER=claude in backend/.env for production.
 
@@ -44,9 +42,9 @@ async-resolved URLs. Default is false (requests + BeautifulSoup, faster, no brow
 
 ## Docs
 
-- docs/system_prompt.md  -- full prompt text + 3 key design decisions
-- docs/tool_schema.md    -- analyze_page schema with field-by-field reasoning
-- docs/architecture.md   -- data flow diagram + module responsibilities
+- docs/system_prompt.md -- full prompt text + 3 key design decisions
+- docs/tool_schema.md -- analyze_page schema with field-by-field reasoning
+- docs/architecture.md -- data flow diagram + module responsibilities
 - sample_prompt_log.json -- real run output (API key redacted)
 
 ---
