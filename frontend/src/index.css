@@ -10,12 +10,13 @@
   --text-label-sm: 0.75rem;
 
   /* Font families */
-  --font-display-lg: "Roboto", sans-serif;
-  --font-headline-lg: "Roboto", sans-serif;
-  --font-headline-md: "Roboto", sans-serif;
-  --font-body-lg: "Roboto", sans-serif;
-  --font-body-md: "Roboto", sans-serif;
-  --font-label-sm: "JetBrains Mono", monospace;
+  --font-display-lg: "Inter", sans-serif;
+  --font-headline-lg: "Inter", sans-serif;
+  --font-headline-md: "Inter", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-label-sm: "Inter", sans-serif;
+  --font-metric: "JetBrains Mono", monospace;
 
   /* Colors — Material Design 3 tokens */
   --color-background: #f8f9ff;
@@ -94,7 +95,7 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: #f8f9ff;
   color: #0b1c30;
   margin: 0;
@@ -131,4 +132,65 @@ body {
 .hover-lift:hover {
   border-color: #7a00df;
   transition: all 0.2s ease-in-out;
+}
+
+@media print {
+  /* Hide interactive chrome */
+  header,
+  [data-url-input],
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Reset page background and ensure ink-friendly colors */
+  body,
+  #root,
+  .bg-background {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Remove shadows and hover borders — not needed in print */
+  .card-flat {
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+  }
+
+  .hover-lift:hover {
+    border-color: #cccccc !important;
+  }
+
+  /* Keep gauge and cards visible and tight */
+  .gauge-progress {
+    transition: none;
+  }
+
+  /* Prevent table rows splitting across pages */
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* Prevent section headings orphaning */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Expand grid to full width — no multi-column in print */
+  .lg\:col-span-8,
+  .lg\:col-span-4,
+  .lg\:col-span-12 {
+    grid-column: span 12 / span 12 !important;
+  }
+
+  /* Print title at top of page */
+  main::before {
+    content: "SEO Audit Report";
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 0.5rem;
+  }
 }
