@@ -12,8 +12,7 @@ Built for the EIGHT25MEDIA AI-Native Software Engineer assignment.
 | Backend        | FastAPI + Uvicorn (Python 3.9+)           |
 | Scraping       | BeautifulSoup4 + Requests                 |
 | Data contracts | Pydantic v2                               |
-| AI (dev)       | Gemini Flash 2.0 (google-generativeai)    |
-| AI (prod)      | Claude Sonnet 4.6 (anthropic)             |
+| AI             | Gemini 2.5 Flash (google-generativeai)    |
 | Readability    | Flesch Reading Ease -- pure Python, no AI |
 
 ---
@@ -25,8 +24,6 @@ Built for the EIGHT25MEDIA AI-Native Software Engineer assignment.
 3. pip install -r backend/requirements.txt
 4. cd backend && uvicorn main:app --reload (http://localhost:8000)
 5. cd frontend && npm install && npm run dev (http://localhost:5173)
-
-Switch AI provider: set AI_PROVIDER=claude in backend/.env for production.
 
 **Optional — JS-rendered page support (Playwright):**
 
@@ -67,6 +64,8 @@ cd backend && pytest tests/ -v
 - Retry once on timeout: handles transient failures -- doubles worst-case latency
 - Default scraper (requests) misses JS-injected images -- USE_PLAYWRIGHT=true resolves this at the cost of a Chromium dep and ~3-5s extra latency
 - Playwright scroll covers one viewport only -- infinite-scroll content below fold is not captured (multi-scroll simulation is out of scope for single-page audit)
+- Gemini 2.5 Flash free tier (AI Studio key): capped at 10 RPM and 500 RPD -- concurrent or repeated requests will hit ResourceExhausted (surfaces as a 502 to the user); upgrade to a paid Gemini API key for higher quotas and commercial use
+- Railway free tier: service spins down after inactivity -- first request after idle incurs a ~5–15s cold-start delay; 512 MB RAM cap means very large page scrapes (heavy DOM + Playwright) may OOM; upgrade to a paid Railway plan for always-on hosting
 
 ---
 

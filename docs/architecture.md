@@ -50,10 +50,9 @@
 │    │     skip AI call                    AuditResponse        │
 │    │                                     (ai_analysis=None)   │
 │    │                                                          │
-│    └── analyzer.py ───────────────────► Gemini Flash (dev)   │
-│          reads AI_PROVIDER env var      └─ Claude Sonnet (prod)
-│          both return (AIAnalysis,         └─ AIAnalysis       │
-│                        PromptLog)            (Pydantic)       │
+│    └── analyzer.py ───────────────────► Gemini 2.5 Flash     │
+│          reads AI_PROVIDER env var      └─ AIAnalysis         │
+│          returns (AIAnalysis, PromptLog)   (Pydantic)         │
 │                                                               │
 │  AuditResponse ◄── models.py (single shared Pydantic contract)│
 │  (ai_analysis Optional — None on metrics_only path)          │
