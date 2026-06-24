@@ -1,7 +1,3 @@
-function borderAccent(condition) {
-  return condition ? 'border-l-4 border-l-error' : 'border-l-4 border-l-primary'
-}
-
 export default function MetricsSection({ data }) {
   const metrics = data ?? {
     wordCount: 1482,
@@ -18,23 +14,21 @@ export default function MetricsSection({ data }) {
     },
   }
 
-  const wordCountWarn = metrics.wordCount < 300 || metrics.wordCount > 3000
-  const imagesWarn    = metrics.images.missingAltPct > 0
-  const titleWarn     = metrics.metaTitle.length === 0 || metrics.metaTitle.length > 60
-  const descWarn      = metrics.metaDescription.length === 0 || metrics.metaDescription.length > 160
+  const titleWarn = metrics.metaTitle.length === 0 || metrics.metaTitle.length > 60
+  const descWarn  = metrics.metaDescription.length === 0 || metrics.metaDescription.length > 160
 
   return (
     <section className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-md">
 
       {/* Word Count */}
-      <div className={`card-flat p-stack-md hover-lift ${borderAccent(wordCountWarn)}`}>
+      <div className="card-flat p-stack-md hover-lift">
         <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Word Count</p>
         <h3 className="font-metric text-headline-md font-bold text-primary">{metrics.wordCount.toLocaleString()}</h3>
         <p className="text-body-md font-body-md text-on-surface-variant">Ideal range: 1k – 2k</p>
       </div>
 
       {/* Headings */}
-      <div className="card-flat p-stack-md hover-lift border-l-4 border-l-primary">
+      <div className="card-flat p-stack-md hover-lift">
         <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Headings</p>
         <div className="flex gap-4 items-end text-body-md font-body-md">
           <div><span className="text-primary font-bold">H1:</span> <span className="font-metric font-bold">{metrics.headings.h1}</span></div>
@@ -44,14 +38,14 @@ export default function MetricsSection({ data }) {
       </div>
 
       {/* CTAs */}
-      <div className="card-flat p-stack-md hover-lift border-l-4 border-l-primary">
+      <div className="card-flat p-stack-md hover-lift">
         <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Call to Actions</p>
         <h3 className="font-metric text-headline-md font-bold text-primary">{metrics.ctas}</h3>
         <p className="text-body-md font-body-md text-on-surface-variant">Conversion signals</p>
       </div>
 
       {/* Links */}
-      <div className="card-flat p-stack-md hover-lift border-l-4 border-l-primary">
+      <div className="card-flat p-stack-md hover-lift">
         <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Links</p>
         <div className="flex flex-col text-body-md font-body-md">
           <span><strong className="text-primary">Internal:</strong> <span className="font-metric font-bold">{metrics.links.internal}</span></span>
@@ -60,7 +54,7 @@ export default function MetricsSection({ data }) {
       </div>
 
       {/* Images */}
-      <div className={`card-flat p-stack-md hover-lift ${borderAccent(imagesWarn)}`}>
+      <div className="card-flat p-stack-md hover-lift">
         <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Images</p>
         <h3 className="font-metric text-headline-md font-bold text-primary">{metrics.images.total}</h3>
         <div className="flex items-center gap-2 mt-1">
@@ -75,7 +69,7 @@ export default function MetricsSection({ data }) {
 
       {/* PageSpeed — only render if data is available */}
       {metrics.pagespeed !== null && (
-        <div className="card-flat p-stack-md hover-lift border-l-4 border-l-primary">
+        <div className="card-flat p-stack-md hover-lift">
           <p className="text-label-sm font-label-sm text-on-surface-variant uppercase mb-stack-xs">Performance</p>
           <h3 className="font-metric text-headline-md font-bold text-primary">{metrics.pagespeed}</h3>
           <p className="text-body-md font-body-md text-on-surface-variant">PageSpeed Score</p>
