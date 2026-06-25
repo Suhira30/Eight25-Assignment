@@ -52,7 +52,6 @@ Respond ONLY with a JSON object using EXACTLY this structure — no other keys:
 URL: https://www.eight25media.com/
 
 ![alt text](image.png)
-![alt text](image-1.png)
 EXTRACTED METRICS:
 - Word count: 270 (ideal range: 1,000–2,000)
 - Headings: H1=1, H2=5, H3=10
@@ -89,6 +88,8 @@ AI info About Contact Us Blog Facebook Linkedin
 ---
 
 ## Raw Model Output (Before Formatting)
+
+![alt text](image-1.png)
 
 ```json
 {
