@@ -46,6 +46,8 @@ def _analyze_gemini(user_prompt: str) -> tuple:
         ),
     )
 
+    logger.info("Gemini input prompt:\n%s", user_prompt)
+
     try:
         response = model.generate_content(user_prompt)
     except ResourceExhausted as exc:
@@ -60,7 +62,7 @@ def _analyze_gemini(user_prompt: str) -> tuple:
         raise AIAnalysisError(reason=str(exc)) from exc
 
     raw_output = response.text
-    logger.debug("Gemini raw output: %s", raw_output[:500])
+    logger.info("Gemini raw output:\n%s", raw_output)
     parsed = json.loads(raw_output)
 
     def _norm_insight(i: dict) -> dict:
