@@ -42,7 +42,7 @@ async-resolved URLs. Default is false (requests + BeautifulSoup, faster, no brow
 - docs/system_prompt.md -- full prompt text + 3 key design decisions
 - docs/tool_schema.md -- analyze_page schema with field-by-field reasoning
 - docs/architecture.md -- data flow diagram + module responsibilities
-- sample_prompt_log.json -- real run output (API key redacted)
+- docs/prompt_log.md -- real run prompt log against eight25media.com (API key redacted)
 
 ---
 

@@ -1,0 +1,145 @@
+# Prompt Log — Live Run
+
+Real run against `https://www.eight25media.com/` on 2026-06-25.  
+AI provider: Gemini 2.5 Flash. API key redacted.
+
+---
+
+## System Prompt
+
+```
+You are an expert digital marketing analyst specializing in SEO and content
+optimization for high-performing marketing websites.
+
+You will receive structured metrics extracted from a single webpage — word count,
+heading structure, CTA counts, link ratios, image alt coverage, meta tags,
+readability score, and a visible text excerpt.
+
+RULES — follow these without exception:
+1. Every insight must reference at least one specific extracted metric by value.
+   Say "your meta description is 182 characters — 22 over the 160-character limit",
+   not "your meta description is too long."
+2. Only analyze metrics present in the data. If a metric was not provided,
+   do not reference, assume, or speculate about it.
+3. Be specific to this page. No generic SEO advice that could apply to any site.
+4. Insights must be relevant to a web marketing agency evaluating a client's page.
+5. Recommendations must be prioritized CRITICAL → HIGH → MEDIUM → LOW,
+   each with reasoning tied directly to a specific metric value.
+
+ANALYSIS DIMENSIONS — cover only what the data supports:
+- seo_structure    : heading hierarchy, meta tag quality, image alt coverage
+- messaging_clarity: value proposition clarity from content excerpt
+- cta_usage        : CTA count relative to word count — sparse, optimal, or diluted
+- content_depth    : word count vs ideal range, heading distribution
+- ux_concerns      : readability barriers, alt text gaps, link ratio anomalies
+
+Respond ONLY with a JSON object using EXACTLY this structure — no other keys:
+{
+  "insights": [
+    {"category": "<seo_structure|messaging_clarity|cta_usage|content_depth|ux_concerns>", "finding": "<metric-referenced sentence>"}
+  ],
+  "recommendations": [
+    {"priority": "<CRITICAL|HIGH|MEDIUM|LOW>", "title": "<short title>", "reasoning": "<why, tied to a metric value>"}
+  ]
+}
+```
+
+---
+
+## User Prompt (Structured Input Sent to Model)
+
+```
+URL: https://www.eight25media.com/
+
+![alt text](image.png)
+![alt text](image-1.png)
+EXTRACTED METRICS:
+- Word count: 270 (ideal range: 1,000–2,000)
+- Headings: H1=1, H2=5, H3=10
+- CTAs detected: 7
+- Links: 49 internal, 2 external
+- Images: 30 total, 28 missing alt text (93%)
+- Meta title: "B2B Digital Agency for Enterprises | eight25" (44/60 chars)
+- Meta description: "Global B2B digital agency offering enterprise web design, mobile apps, and strategic consulting for Fortune 500 firms." (118/160 chars)
+- Readability: 40.03/100 (Difficult)
+
+PAGE CONTENT EXCERPT (first 3,000 chars of visible text):
+Work Services Brand Brand Strategy Visual Identity Brand Enablement Campaign
+Development Creative Web Design App + Interface Design Interaction + Motion Design
+Video Technology CMS Implementation Web Architecture + Backend Development
+Personalization Data Integration + Analytics Growth Search Engine Optimization
+Conversion Rate Optimization Account Based Marketing Content Strategy + Marketing
+Execution Studio Services Platforms About Blog Let's talk Digital experiences for
+the modern enterprise We build brands and web experiences that help you build the
+ultimate customer journey. The world's best companies choose to work with eight25
+Google Qlik Intralinks Andela Qualcomm View all work Insights Analyzing the
+'Request a Demo' Page: Unpacking Why Conversions Are Lagging B2B SaaS Enterprise
+Demo Read More Uncovering Homepage Hero Friction: Why Visitors Bounce and How to
+Fix It GTM B2B SaaS Read More Why Is Brand Alignment Important For B2B Enterprise
+Websites? GTM B2B Read More Assessment: Is your website dressed for success? GTM
+B2B SaaS Read More Planning to Sell to Enterprise? Start With a Hard Look at Your
+Website CRO Social proof Product images Read More Read our blog Success stories…
+We are partnering with forward-thinking companies and privileged to work with
+Fortune 500 companies, technology SMEs, and funded startups. Let's work together.
+Name Email Address Phone Company Message.... Submit 2055 Gateway Place - Ste 500
+San Jose, CA 95110 © 2026 EIGHT25MEDIA. All Rights Reserved Privacy Policy Terms
+AI info About Contact Us Blog Facebook Linkedin
+```
+
+---
+
+## Raw Model Output (Before Formatting)
+
+```json
+{
+  "insights": [
+    {
+      "category": "seo_structure",
+      "finding": "The page demonstrates a structured heading hierarchy with 1 H1, 5 H2s, and 10 H3s, which is beneficial for content organization. However, 28 of 30 images (93%) are missing alt text, severely impacting accessibility and image search indexing for a visually-led agency site."
+    },
+    {
+      "category": "messaging_clarity",
+      "finding": "The visible content clearly states the core value proposition: 'Digital experiences for the modern enterprise' and 'We build brands and web experiences that help you build the ultimate customer journey.' The meta description at 118 characters is within the 160-character limit and clearly identifies the B2B enterprise focus."
+    },
+    {
+      "category": "cta_usage",
+      "finding": "With 7 CTAs detected within a short 270-word page, the call-to-action density is high, averaging one CTA every 38.5 words — well above the optimal 1-per-100-to-200-words range, which risks diluting conversion intent."
+    },
+    {
+      "category": "content_depth",
+      "finding": "The page's word count of 270 is significantly below the ideal range of 1,000–2,000 words. With only 270 words spread across 1 H1, 5 H2s, and 10 H3s, each section is extremely thin, limiting topical authority and SEO depth."
+    },
+    {
+      "category": "ux_concerns",
+      "finding": "The readability score of 40.03/100 (Difficult) indicates content complexity above what most users can quickly scan. Combined with 49 internal links on a 270-word page, the navigation density may overwhelm users and dilute link equity across key destination pages."
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "CRITICAL",
+      "title": "Add alt text to 28 missing images",
+      "reasoning": "93% of images (28 of 30) lack alt attributes. For a B2B agency whose homepage is image and video-heavy, missing alt text signals a quality gap to both search crawlers and enterprise clients reviewing page source."
+    },
+    {
+      "priority": "HIGH",
+      "title": "Expand page content depth to at least 1,000 words",
+      "reasoning": "At 270 words, the page is 73% below the 1,000-word lower bound of the ideal range. Adding service descriptions, client outcome summaries, or case study excerpts would improve keyword coverage and give the AI more signal to surface stronger insights."
+    },
+    {
+      "priority": "HIGH",
+      "title": "Improve content readability",
+      "reasoning": "A Flesch score of 40.03 (Difficult) on a homepage targeting enterprise decision-makers who scan quickly is a friction point. Shorter sentences and plain-language service descriptions would improve scannability without reducing authority."
+    },
+    {
+      "priority": "MEDIUM",
+      "title": "Consolidate or reduce CTA count",
+      "reasoning": "7 CTAs in 270 words gives a density of 1 per 38 words — nearly 5x the optimal rate. Reducing to 2–3 primary CTAs with clear hierarchy (primary action vs. secondary) would focus conversion intent."
+    },
+    {
+      "priority": "MEDIUM",
+      "title": "Review internal link strategy",
+      "reasoning": "49 internal links on a 270-word page creates an unusually high link density. Auditing which links are navigation-only vs. editorial and reducing non-essential links would improve both UX clarity and page authority distribution."
+    }
+  ]
+}
+```
